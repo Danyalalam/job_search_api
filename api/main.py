@@ -8,6 +8,10 @@ import logging
 import random
 from dotenv import load_dotenv
 from indeed_scraper import ApifyIndeedScraper
+import datetime
+
+
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -27,6 +31,16 @@ app = FastAPI(
     description="API that fetches relevant job listings from LinkedIn, Google Jobs, and other sources",
     version="1.0.0",
 )
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring and keep-alive pings."""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "service": "job-finder-api",
+        "version": "1.0.0"
+    }
 
 class JobSearchRequest(BaseModel):
     position: str
@@ -267,6 +281,14 @@ async def root():
         "sources": ["LinkedIn", "Google Jobs (SERPAPI)", "Indeed (Apify)"],
         "version": "1.0.0"
     }
+import os
+from api.keep_alive import KeepAliveService
+    
+if os.getenv("RENDER", ""):
+    # We're on Render, start the keep-alive service
+    keep_alive_service = KeepAliveService(interval_minutes=5)
+    keep_alive_service.start()
+    logger.info("Started keep-alive service for Render deployment")
 
 if __name__ == "__main__":
     # Modified to correctly reference this file
