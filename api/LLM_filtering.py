@@ -20,13 +20,21 @@ class GeminiJobFilter:
         Args:
             api_key: Google API key for Gemini access (defaults to environment variable)
         """
-        self.api_key = api_key or os.environ.get("GOOGLE_API_KEY")
+        # Try to get API key from parameter, then from environment variable
+        self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
+        
         if not self.api_key:
-            raise ValueError("Google API key is required. Set GOOGLE_API_KEY environment variable or pass it to the constructor.")
+            logger.error("No Google API key found. Make sure to set GOOGLE_API_KEY in your .env file or pass it directly.")
+            raise ValueError("Google API key is required. Set GOOGLE_API_KEY in .env file or pass it to the constructor.")
         
         # Configure the Gemini API
-        genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')
+        try:
+            genai.configure(api_key=self.api_key)
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            logger.info("Successfully initialized Gemini API")
+        except Exception as e:
+            logger.error(f"Error initializing Gemini API: {e}")
+            raise
     
     def filter_relevant_jobs(self, jobs: List[Dict[str, Any]], search_criteria: Dict[str, str], 
                             min_score: float = 0.3, max_jobs: int = 20) -> List[Dict[str, Any]]:
@@ -183,45 +191,45 @@ IMPORTANT: Return your response in this EXACT JSON format:
         return f"{job_details}\n\n{search_criteria}\n\n{instructions}"
 
 
-# Usage example
-if __name__ == "__main__":
-    # Set API key - replace with your actual key or set it as an environment variable
-    os.environ["GOOGLE_API_KEY"] = "AIzaSyAL8StFk0i7YEX-6kUdri2IHvDyL4Z3dDc"
+# # Usage example
+# if __name__ == "__main__":
+#     # Set API key - replace with your actual key or set it as an environment variable
+#     os.environ["GOOGLE_API_KEY"] = ""
     
-    # Test job
-    test_job = {
-        "job_title": "Full Stack Engineer",
-        "company": "XYZ Pvt Ltd",
-        "experience": "2+ years",
-        "jobNature": "onsite",
-        "location": "Islamabad, Pakistan",
-        "salary": "100,000 PKR",
-        "apply_link": "https://linkedin.com/job123",
-        "description": "Looking for a Full Stack Developer with experience in MERN stack. Skills needed: React, Node.js, MongoDB, Express, JavaScript, HTML/CSS."
-    }
+#     # Test job
+#     test_job = {
+#         "job_title": "Full Stack Engineer",
+#         "company": "XYZ Pvt Ltd",
+#         "experience": "2+ years",
+#         "jobNature": "onsite",
+#         "location": "Islamabad, Pakistan",
+#         "salary": "100,000 PKR",
+#         "apply_link": "https://linkedin.com/job123",
+#         "description": "Looking for a Full Stack Developer with experience in MERN stack. Skills needed: React, Node.js, MongoDB, Express, JavaScript, HTML/CSS."
+#     }
     
-    # Test criteria
-    test_criteria = {
-        "position": "Full Stack Engineer",
-        "experience": "2 years",
-        "salary": "70,000 PKR to 120,000 PKR",
-        "jobNature": "onsite",
-        "location": "Pakistan",
-        "skills": "full stack, MERN, Node.js, Express.js, React.js, Next.js, Firebase"
-    }
+#     # Test criteria
+#     test_criteria = {
+#         "position": "Full Stack Engineer",
+#         "experience": "2 years",
+#         "salary": "70,000 PKR to 120,000 PKR",
+#         "jobNature": "onsite",
+#         "location": "Pakistan",
+#         "skills": "full stack, MERN, Node.js, Express.js, React.js, Next.js, Firebase"
+#     }
     
-    try:
-        # Initialize the filter
-        job_filter = GeminiJobFilter()
+#     try:
+#         # Initialize the filter
+#         job_filter = GeminiJobFilter()
         
-        # Test single job relevance
-        score, reasoning = job_filter._evaluate_job_relevance(test_job, test_criteria)
-        print(f"Relevance score: {score}")
-        print(f"Reasoning: {reasoning}")
+#         # Test single job relevance
+#         score, reasoning = job_filter._evaluate_job_relevance(test_job, test_criteria)
+#         print(f"Relevance score: {score}")
+#         print(f"Reasoning: {reasoning}")
         
-        # Test filtering multiple jobs
-        filtered_jobs = job_filter.filter_relevant_jobs([test_job, test_job], test_criteria)
-        print(f"Filtered {len(filtered_jobs)} jobs")
+#         # Test filtering multiple jobs
+#         filtered_jobs = job_filter.filter_relevant_jobs([test_job, test_job], test_criteria)
+#         print(f"Filtered {len(filtered_jobs)} jobs")
         
-    except Exception as e:
-        print(f"Error during testing: {str(e)}")
+#     except Exception as e:
+#         print(f"Error during testing: {str(e)}")
