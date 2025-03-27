@@ -7,7 +7,7 @@ import os
 import logging
 import random
 from dotenv import load_dotenv
-from api.indeed_scraper import ApifyIndeedScraper
+from indeed_scraper import ApifyIndeedScraper
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
