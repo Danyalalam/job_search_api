@@ -50,7 +50,7 @@ st.markdown("""
         border-left: 5px solid #E74C3C;
     }
     .apply-button {
-        background-color: #4CAF50;
+        background-color: white;
         color: white;
         padding: 10px 18px;
         text-align: center;
