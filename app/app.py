@@ -68,7 +68,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # API endpoint
-API_URL = "https://job-search-api-3ofh.onrender.com/search-jobs"
+API_URL = "https://job-search-api-bav8.onrender.com/search-jobs"
 
 # App title
 st.title("🔎 Job Finder")

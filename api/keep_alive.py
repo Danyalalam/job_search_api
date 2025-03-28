@@ -29,7 +29,7 @@ class KeepAliveService:
         self.url = os.getenv("SERVICE_URL")
         if not self.url:
             # Try to construct from Render environment variables
-            render_service = os.getenv("RENDER_SERVICE_NAME", "job-search-api-3ofh")
+            render_service = os.getenv("RENDER_SERVICE_NAME", "job-search-api-bav8")
             if render_service:
                 self.url = f"https://{render_service}.onrender.com"
             else:
